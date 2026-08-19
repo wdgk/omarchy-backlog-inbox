@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "id": "community.backlog-inbox",
+  "name": "Backlog Inbox",
+  "version": "0.2.0",
+  "author": "Gaku Wada",
+  "license": "MIT",
+  "description": "Shows your assigned Backlog issues in the Omarchy bar",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "Panel.qml"
+  },
+  "barWidget": {
+    "displayName": "Backlog Inbox",
+    "description": "Your assigned Backlog issues",
+    "category": "Productivity",
+    "aliases": [
+      "backlog",
+      "issues",
+      "inbox"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "refreshIntervalSec": 300,
+      "limit": 10,
+      "space": "",
+      "beePath": ""
+    },
+    "schema": [
+      {
+        "key": "refreshIntervalSec",
+        "type": "integer",
+        "label": "Refresh interval (seconds)",
+        "min": 60,
+        "max": 3600,
+        "step": 60,
+        "defaultValue": 300
+      },
+      {
+        "key": "limit",
+        "type": "integer",
+        "label": "Issues to display",
+        "min": 1,
+        "max": 50,
+        "step": 1,
+        "defaultValue": 10
+      },
+      {
+        "key": "space",
+        "type": "string",
+        "label": "Backlog space hostname",
+        "description": "Optional. Leave blank to use the active space selected in Bee.",
+        "defaultValue": ""
+      },
+      {
+        "key": "beePath",
+        "type": "string",
+        "label": "Bee executable path",
+        "description": "Optional. Set the absolute path when omarchy-shell cannot find bee in PATH.",
+        "defaultValue": ""
+      }
+    ]
+  }
+}
