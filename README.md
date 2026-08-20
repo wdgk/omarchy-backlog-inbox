@@ -11,6 +11,7 @@ Nulab product and is not covered by Nulab support.
 
 - Shows `BL <count>` in the bar (`+` means the result may be truncated).
 - Opens a configurable list of assigned issues (10 by default, up to 50).
+- Pages through fetched issues with the left/right keys or footer arrows.
 - Orders issues by due date, earliest first, with undated issues last.
 - Highlights overdue and due-today issues and labels undated issues.
 - Opens the selected issue in the browser.

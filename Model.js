@@ -1,5 +1,5 @@
 function emptyState() {
-  return { ok: true, count: 0, issues: [], rawCount: 0, truncated: false, error: "" }
+  return { ok: true, count: 0, issues: [], allIssues: [], rawCount: 0, truncated: false, error: "" }
 }
 
 function normalizedIssue(issue) {
@@ -65,6 +65,21 @@ function sortByDueDate(issues) {
   })
 }
 
+function pageCount(itemCount, pageSize) {
+  var count = Math.max(0, Number(itemCount) || 0)
+  var size = Math.max(1, Math.min(50, Number(pageSize) || 10))
+  return Math.max(1, Math.ceil(count / size))
+}
+
+function pageItems(issues, page, pageSize) {
+  var items = Array.isArray(issues) ? issues : []
+  var size = Math.max(1, Math.min(50, Number(pageSize) || 10))
+  var lastPage = pageCount(items.length, size) - 1
+  var currentPage = Math.max(0, Math.min(lastPage, Number(page) || 0))
+  var start = currentPage * size
+  return items.slice(start, start + size)
+}
+
 function parseResponse(raw, limit, fetchLimit) {
   var text = String(raw || "").trim()
   if (text === "") return { ok: false, count: 0, issues: [], rawCount: 0, truncated: false, error: "Bee returned no data" }
@@ -87,6 +102,7 @@ function parseResponse(raw, limit, fetchLimit) {
       ok: true,
       count: visible.length,
       issues: visible.slice(0, rowLimit),
+      allIssues: visible,
       rawCount: parsed.length,
       truncated: parsed.length >= requestedCount,
       error: ""
@@ -135,6 +151,8 @@ if (typeof module !== "undefined") {
     dueState: dueState,
     dueLabel: dueLabel,
     sortByDueDate: sortByDueDate,
+    pageCount: pageCount,
+    pageItems: pageItems,
     normalizedIssue: normalizedIssue,
     parseResponse: parseResponse,
     labelFor: labelFor

@@ -44,6 +44,23 @@ const dueSorted = Model.parseResponse(JSON.stringify([
   { issueKey: "TEST-1", summary: "Earlier", status: { id: 1, name: "Open" }, dueDate: "2026-08-21" }
 ]), 10, 100)
 assert.deepEqual(dueSorted.issues.map((issue) => issue.key), ["TEST-1", "TEST-2", "TEST-3"])
+assert.equal(Model.pageCount(0, 10), 1)
+assert.equal(Model.pageCount(15, 10), 2)
+assert.deepEqual(Model.pageItems(dueSorted.allIssues, 0, 2).map((issue) => issue.key), ["TEST-1", "TEST-2"])
+assert.deepEqual(Model.pageItems(dueSorted.allIssues, 1, 2).map((issue) => issue.key), ["TEST-3"])
+assert.deepEqual(Model.pageItems(dueSorted.allIssues, 99, 2).map((issue) => issue.key), ["TEST-3"])
+
+const fifteenIssues = Array.from({ length: 15 }, (_, i) => ({
+  issueKey: "PAGE-" + (i + 1),
+  summary: "Page test " + (i + 1),
+  status: { id: 1, name: "Open" },
+  dueDate: "2026-09-" + String(i + 1).padStart(2, "0")
+}))
+const paged = Model.parseResponse(JSON.stringify(fifteenIssues), 10, 100)
+assert.equal(paged.issues.length, 10)
+assert.equal(paged.allIssues.length, 15)
+assert.equal(Model.pageCount(paged.count, 10), 2)
+assert.equal(Model.pageItems(paged.allIssues, 1, 10).length, 5)
 assert.equal(Model.errorMessage('{"message":"Not authenticated"}'), "Not authenticated")
 
 const fullPage = []

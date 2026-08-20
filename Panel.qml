@@ -19,6 +19,7 @@ Panel {
   property string errorOutput: ""
   property string lastError: ""
   property string todayKey: Model.localDateKey(new Date())
+  property int currentPage: 0
   property int selectedIndex: 0
   property bool refreshTimedOut: false
 
@@ -30,7 +31,9 @@ Panel {
     Number(setting("limit", 10)) || 10))
   readonly property string configuredSpace: String(setting("space", "") || "").trim()
   readonly property string beeExecutable: String(setting("beePath", "") || "").trim() || "bee"
-  readonly property var issues: inbox.issues || []
+  readonly property var allIssues: inbox.allIssues || inbox.issues || []
+  readonly property int pageCount: Model.pageCount(allIssues.length, displayLimit)
+  readonly property var issues: Model.pageItems(allIssues, currentPage, displayLimit)
 
   function refresh() {
     if (fetchProcess.running) return
@@ -65,6 +68,7 @@ Panel {
     if (result.ok) {
       inbox = result
       lastError = ""
+      currentPage = Math.min(currentPage, pageCount - 1)
     } else {
       lastError = errorOutput !== "" ? Model.errorMessage(errorOutput) : result.error
     }
@@ -88,6 +92,18 @@ Panel {
   function moveSelection(delta) {
     if (issues.length === 0) return
     selectedIndex = (selectedIndex + delta + issues.length) % issues.length
+  }
+
+  function movePage(delta) {
+    var nextPage = Math.max(0, Math.min(pageCount - 1, currentPage + delta))
+    if (nextPage === currentPage) return
+    currentPage = nextPage
+    selectedIndex = 0
+  }
+
+  onPageCountChanged: {
+    currentPage = Math.min(currentPage, pageCount - 1)
+    selectedIndex = Math.min(selectedIndex, Math.max(0, issues.length - 1))
   }
 
   onOpenedChanged: if (opened) refresh()
@@ -172,6 +188,7 @@ Panel {
       id: keyCatcher
       anchors.fill: parent
       onMoveRequested: function(dx, dy) {
+        if (dx !== 0) root.movePage(dx)
         if (dy !== 0) root.moveSelection(dy)
       }
       onActivateRequested: root.openSelected()
@@ -305,6 +322,56 @@ Panel {
                 onEntered: root.selectedIndex = index
                 onClicked: root.openIssue(modelData)
               }
+            }
+          }
+
+          Item {
+            visible: root.pageCount > 1
+            width: parent.width
+            height: visible ? Style.space(32) : 0
+
+            Text {
+              id: previousPageLabel
+              anchors.left: parent.left
+              anchors.verticalCenter: parent.verticalCenter
+              text: "←"
+              color: root.currentPage > 0
+                ? root.bar.foreground
+                : Qt.darker(root.bar.foreground, 1.8)
+              font.family: root.bar.fontFamily
+              font.pixelSize: Style.font.body
+            }
+
+            Text {
+              anchors.centerIn: parent
+              text: "Page " + (root.currentPage + 1) + " / " + root.pageCount + "  ·  ←/→"
+              color: Qt.darker(root.bar.foreground, 1.4)
+              font.family: root.bar.fontFamily
+              font.pixelSize: Style.font.caption
+            }
+
+            Text {
+              id: nextPageLabel
+              anchors.right: parent.right
+              anchors.verticalCenter: parent.verticalCenter
+              text: "→"
+              color: root.currentPage < root.pageCount - 1
+                ? root.bar.foreground
+                : Qt.darker(root.bar.foreground, 1.8)
+              font.family: root.bar.fontFamily
+              font.pixelSize: Style.font.body
+            }
+
+            MouseArea {
+              anchors.fill: previousPageLabel
+              cursorShape: root.currentPage > 0 ? Qt.PointingHandCursor : Qt.ArrowCursor
+              onClicked: root.movePage(-1)
+            }
+
+            MouseArea {
+              anchors.fill: nextPageLabel
+              cursorShape: root.currentPage < root.pageCount - 1 ? Qt.PointingHandCursor : Qt.ArrowCursor
+              onClicked: root.movePage(1)
             }
           }
         }
