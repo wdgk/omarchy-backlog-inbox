@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "community.backlog-inbox",
   "name": "Backlog Inbox",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": "Gaku Wada",
   "license": "MIT",
   "description": "Shows your assigned Backlog issues in the Omarchy bar",

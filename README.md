@@ -11,6 +11,8 @@ Nulab product and is not covered by Nulab support.
 
 - Shows `BL <count>` in the bar (`+` means the result may be truncated).
 - Opens a configurable list of assigned issues (10 by default, up to 50).
+- Orders issues by due date, earliest first, with undated issues last.
+- Highlights overdue and due-today issues and labels undated issues.
 - Opens the selected issue in the browser.
 - Refreshes on open, every five minutes, or with `R`/middle-click.
 - Excludes status ID `4` and statuses named `完了`, `Closed`, or `Completed`.
@@ -39,7 +41,7 @@ bee auth login --method oauth
 Confirm that the exact read-only command used by the plugin works:
 
 ```bash
-bee issue list --assignee @me --count 100 \
+bee issue list --assignee @me --sort dueDate --order asc --count 100 \
   --json issueKey,summary,status,priority,dueDate
 ```
 
@@ -104,7 +106,7 @@ Omarchy plugins run as unsandboxed code inside `omarchy-shell`. Review plugins
 before enabling them. This plugin only runs two fixed Bee commands:
 
 ```text
-bee issue list --assignee @me --count 100 --json ...
+bee issue list --assignee @me --sort dueDate --order asc --count 100 --json ...
 bee browse <issue-key>
 ```
 

@@ -28,6 +28,22 @@ assert.equal(parsed.issues.length, 1)
 assert.equal(parsed.issues[0].key, "TEST-1")
 assert.equal(parsed.issues[0].dueDate, "2026-08-21")
 assert.equal(Model.labelFor(parsed, false, true), "BL 2 !")
+
+assert.equal(Model.localDateKey(new Date(2026, 7, 21)), "2026-08-21")
+assert.equal(Model.dueState("", "2026-08-21"), "none")
+assert.equal(Model.dueState("2026-08-20", "2026-08-21"), "overdue")
+assert.equal(Model.dueState("2026-08-21", "2026-08-21"), "today")
+assert.equal(Model.dueState("2026-08-22", "2026-08-21"), "upcoming")
+assert.equal(Model.dueLabel("", "2026-08-21"), "No due date")
+assert.equal(Model.dueLabel("2026-08-20", "2026-08-21"), "Overdue · 2026-08-20")
+assert.equal(Model.dueLabel("2026-08-21", "2026-08-21"), "Due today · 2026-08-21")
+
+const dueSorted = Model.parseResponse(JSON.stringify([
+  { issueKey: "TEST-3", summary: "Undated", status: { id: 1, name: "Open" }, dueDate: null },
+  { issueKey: "TEST-2", summary: "Later", status: { id: 1, name: "Open" }, dueDate: "2026-08-22" },
+  { issueKey: "TEST-1", summary: "Earlier", status: { id: 1, name: "Open" }, dueDate: "2026-08-21" }
+]), 10, 100)
+assert.deepEqual(dueSorted.issues.map((issue) => issue.key), ["TEST-1", "TEST-2", "TEST-3"])
 assert.equal(Model.errorMessage('{"message":"Not authenticated"}'), "Not authenticated")
 
 const fullPage = []

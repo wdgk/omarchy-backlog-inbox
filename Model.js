@@ -24,6 +24,47 @@ function isCompleted(issue) {
     || name === "completed"
 }
 
+function localDateKey(value) {
+  var date = value instanceof Date ? value : new Date(value)
+  if (isNaN(date.getTime())) return ""
+  var year = String(date.getFullYear())
+  var monthNumber = date.getMonth() + 1
+  var dayNumber = date.getDate()
+  var month = (monthNumber < 10 ? "0" : "") + String(monthNumber)
+  var day = (dayNumber < 10 ? "0" : "") + String(dayNumber)
+  return year + "-" + month + "-" + day
+}
+
+function dueState(dueDate, today) {
+  var due = String(dueDate || "").substring(0, 10)
+  var current = String(today || "").substring(0, 10)
+  if (due === "") return "none"
+  if (current === "") return "upcoming"
+  if (due < current) return "overdue"
+  if (due === current) return "today"
+  return "upcoming"
+}
+
+function dueLabel(dueDate, today) {
+  var due = String(dueDate || "").substring(0, 10)
+  var state = dueState(due, today)
+  if (state === "none") return "No due date"
+  if (state === "overdue") return "Overdue · " + due
+  if (state === "today") return "Due today · " + due
+  return "Due " + due
+}
+
+function sortByDueDate(issues) {
+  return issues.sort(function(a, b) {
+    var left = String(a && a.dueDate ? a.dueDate : "")
+    var right = String(b && b.dueDate ? b.dueDate : "")
+    if (left === right) return 0
+    if (left === "") return 1
+    if (right === "") return -1
+    return left < right ? -1 : 1
+  })
+}
+
 function parseResponse(raw, limit, fetchLimit) {
   var text = String(raw || "").trim()
   if (text === "") return { ok: false, count: 0, issues: [], rawCount: 0, truncated: false, error: "Bee returned no data" }
@@ -37,6 +78,7 @@ function parseResponse(raw, limit, fetchLimit) {
       var issue = normalizedIssue(parsed[i])
       if (issue.key !== "") visible.push(issue)
     }
+    sortByDueDate(visible)
     var numericLimit = Number(limit)
     var numericFetchLimit = Number(fetchLimit)
     var rowLimit = isFinite(numericLimit) ? Math.max(1, Math.min(50, numericLimit)) : 10
@@ -89,6 +131,10 @@ if (typeof module !== "undefined") {
     errorMessage: errorMessage,
     redactSecrets: redactSecrets,
     isCompleted: isCompleted,
+    localDateKey: localDateKey,
+    dueState: dueState,
+    dueLabel: dueLabel,
+    sortByDueDate: sortByDueDate,
     normalizedIssue: normalizedIssue,
     parseResponse: parseResponse,
     labelFor: labelFor

@@ -18,6 +18,7 @@ Panel {
   property string output: ""
   property string errorOutput: ""
   property string lastError: ""
+  property string todayKey: Model.localDateKey(new Date())
   property int selectedIndex: 0
   property bool refreshTimedOut: false
 
@@ -40,6 +41,8 @@ Panel {
     var command = [
       beeExecutable, "issue", "list",
       "--assignee", "@me",
+      "--sort", "dueDate",
+      "--order", "asc",
       "--count", String(fetchLimit),
       "--json", "issueKey,summary,status,priority,dueDate"
     ]
@@ -129,6 +132,13 @@ Panel {
     repeat: true
     triggeredOnStart: true
     onTriggered: root.refresh()
+  }
+
+  Timer {
+    interval: 60000
+    running: true
+    repeat: true
+    onTriggered: root.todayKey = Model.localDateKey(new Date())
   }
 
   WidgetButton {
@@ -242,12 +252,17 @@ Panel {
             Rectangle {
               required property var modelData
               required property int index
+              readonly property string deadlineState: Model.dueState(modelData.dueDate, root.todayKey)
               width: content.width
               height: issueColumn.implicitHeight + Style.space(18)
               radius: Style.cornerRadius
               color: index === root.selectedIndex
                 ? Style.hoverFillFor(root.bar.foreground, Color.accent)
-                : "transparent"
+                : deadlineState === "overdue"
+                  ? Style.hoverFillFor(root.bar.foreground, Color.urgent)
+                  : deadlineState === "today"
+                    ? Style.hoverFillFor(root.bar.foreground, Color.accent)
+                    : "transparent"
 
               Column {
                 id: issueColumn
@@ -271,8 +286,12 @@ Panel {
                 Text {
                   width: parent.width
                   text: String(modelData.status || "")
-                    + (modelData.dueDate ? "  ·  Due " + modelData.dueDate : "")
-                  color: Qt.darker(root.bar.foreground, 1.4)
+                    + "  ·  " + Model.dueLabel(modelData.dueDate, root.todayKey)
+                  color: deadlineState === "overdue"
+                    ? Color.urgent
+                    : deadlineState === "today"
+                      ? Color.accent
+                      : Qt.darker(root.bar.foreground, 1.4)
                   font.family: root.bar.fontFamily
                   font.pixelSize: Style.font.caption
                   elide: Text.ElideRight
