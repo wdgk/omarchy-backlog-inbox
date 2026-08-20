@@ -7,7 +7,7 @@ current Backlog user. Authentication and API access are delegated to the
 This is an unofficial personal project by Gaku Wada. It is not an official
 Nulab product and is not covered by Nulab support.
 
-## MVP behavior
+## Features
 
 - Shows `BL <count>` in the bar (`+` means the result may be truncated).
 - Opens a configurable list of assigned issues (10 by default, up to 50).
@@ -17,8 +17,6 @@ Nulab product and is not covered by Nulab support.
 - Opens the selected issue in the browser.
 - Refreshes on open, every five minutes, or with `R`/middle-click.
 - Excludes status ID `4` and statuses named `完了`, `Closed`, or `Completed`.
-- Keeps the previous issue list visible when a refresh fails.
-- Stops a refresh and reports an error if Bee does not respond within 30 seconds.
 
 ## Requirements
 
@@ -57,8 +55,7 @@ Then set **Bee executable path** in the plugin settings, for example
 `/home/you/.nvm/versions/node/v24.11.1/bin/bee`. Leaving the setting blank uses
 `bee` from the GUI session's `PATH`.
 
-The plugin never reads Bee's credentials. Bee stores its own authentication
-configuration in `.beerc` with mode `0600` and refreshes OAuth tokens.
+The plugin never reads Bee's credentials.
 
 ## Install on Omarchy Quattro
 
@@ -66,12 +63,6 @@ Install directly from GitHub:
 
 ```bash
 omarchy plugin add https://github.com/wdgk/omarchy-backlog-inbox.git --enable
-```
-
-During local development, add a checkout directly:
-
-```bash
-omarchy plugin add "$PWD" --enable
 ```
 
 ## Settings
@@ -91,16 +82,6 @@ the bar adds `+` to the count and the panel warns that older open issues may be
 omitted. Custom workflow statuses that represent completion but have another
 ID and name cannot be identified reliably by this version.
 
-## Development checks
-
-```bash
-omarchy plugin validate .
-qmllint -U -I /usr/share/omarchy/shell Panel.qml
-node --check Model.js
-node test_model.js
-python3 -m json.tool manifest.json >/dev/null
-```
-
 ## Security note
 
 Omarchy plugins run as unsandboxed code inside `omarchy-shell`. Review plugins
@@ -112,6 +93,4 @@ bee browse <issue-key>
 ```
 
 The plugin never reads Bee's credential files and does not store credentials.
-Bee's stderr may be shown in the UI after basic redaction of API keys, bearer
-tokens, OAuth token parameters, and long token-like strings. Avoid publishing
-screenshots containing private issue data or unreviewed error messages.
+Avoid publishing screenshots containing private issue data.
