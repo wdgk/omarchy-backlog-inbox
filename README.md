@@ -20,7 +20,8 @@ Nulab product and is not covered by Nulab support.
 
 ## Requirements
 
-Install Bee and authenticate it before enabling this plugin:
+Bee requires Node.js 20.18 or later. Install Bee and authenticate it before
+enabling this plugin:
 
 ```bash
 npm install -g @nulab/bee
@@ -28,8 +29,9 @@ bee auth login
 bee auth status
 ```
 
-Bee supports both API-key and OAuth authentication. For OAuth, register a
-Backlog OAuth application with `http://localhost:5033/callback`, then run:
+`bee auth login` uses API-key authentication by default. OAuth is optional. To
+use OAuth, register a Backlog OAuth application with
+`http://localhost:5033/callback`, then run:
 
 ```bash
 export BACKLOG_OAUTH_CLIENT_ID="..."
@@ -44,17 +46,6 @@ bee issue list --assignee @me --sort dueDate --order asc --count 100 \
   --json issueKey,summary,status,priority,dueDate
 ```
 
-If Bee was installed through nvm, `omarchy-shell` may not inherit the shell
-configuration that adds Bee to `PATH`. Find its absolute path:
-
-```bash
-which bee
-```
-
-Then set **Bee executable path** in the plugin settings, for example
-`/home/you/.nvm/versions/node/v24.11.1/bin/bee`. Leaving the setting blank uses
-`bee` from the GUI session's `PATH`.
-
 The plugin never reads Bee's credentials.
 
 ## Install on Omarchy Quattro
@@ -65,6 +56,18 @@ Install directly from GitHub:
 omarchy plugin add https://github.com/wdgk/omarchy-backlog-inbox.git --enable
 ```
 
+## Bee not found
+
+If Bee was installed through a Node.js version manager such as mise or nvm,
+`omarchy-shell` may not inherit its path. Save Bee's absolute path in the
+plugin settings:
+
+```bash
+omarchy bar set community.backlog-inbox beePath "$(command -v bee)"
+```
+
+Leaving this setting blank uses `bee` from the GUI session's `PATH`.
+
 ## Settings
 
 | Setting | Default | Description |
@@ -72,7 +75,7 @@ omarchy plugin add https://github.com/wdgk/omarchy-backlog-inbox.git --enable
 | Refresh interval | 300 seconds | Between 60 and 3,600 seconds |
 | Issues to display | 10 | Between 1 and 50 rows |
 | Backlog space hostname | Active Bee space | Optional hostname for multi-space setups |
-| Bee executable path | `bee` from `PATH` | Optional absolute path, useful with nvm |
+| Bee executable path | `bee` from `PATH` | Optional absolute path, useful with mise or nvm |
 
 ## Known limitation
 
