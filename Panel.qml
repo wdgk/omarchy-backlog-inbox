@@ -10,6 +10,9 @@ Panel {
   moduleName: "community.backlog-inbox"
   ipcTarget: "community.backlog-inbox"
 
+  implicitWidth: button.implicitWidth
+  implicitHeight: button.implicitHeight
+
   property var inbox: Model.emptyState()
   property bool loading: false
   property string output: ""
