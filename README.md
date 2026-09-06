@@ -1,11 +1,11 @@
 # Omarchy Backlog Inbox
 
-An experimental Omarchy Quattro bar widget that shows issues assigned to the
+An Omarchy Quattro bar widget that shows issues assigned to the
 current Backlog user. Authentication and API access are delegated to the
 [Bee Backlog CLI](https://github.com/nulab/bee).
 
-This is an unofficial personal project by Gaku Wada. It is not an official
-Nulab product and is not covered by Nulab support.
+This is an unofficial project. It is not an official Nulab product and is not
+covered by Nulab support.
 
 ## Features
 
@@ -79,8 +79,8 @@ Leaving this setting blank uses `bee` from the GUI session's `PATH`.
 
 ## Known limitation
 
-Bee returns at most 100 issues for the command used by this MVP. The plugin
-then removes completed issues locally. When Bee returns exactly 100 records,
+Bee returns at most 100 issues for the command this plugin uses. Completed
+issues are then removed locally. When Bee returns exactly 100 records,
 the bar adds `+` to the count and the panel warns that older open issues may be
 omitted. Custom workflow statuses that represent completion but have another
 ID and name cannot be identified reliably by this version.
